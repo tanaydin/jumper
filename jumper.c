@@ -81,8 +81,7 @@ int main(int argc, char *argv[])
                     mpz_mod(mod, bigNumber, start);
                     if (mpz_cmp(mod, zero) == 0)
                     {
-                        mpz_out_str(stdout, 10, start);
-                        gmp_printf("\n%Zd\n", mod);
+                        gmp_printf("Factor  : %Zd\n", start);
                         exit(0);
                     }
                     break;

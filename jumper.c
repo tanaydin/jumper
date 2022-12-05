@@ -4,7 +4,6 @@
 #include <signal.h>
 #include <time.h>
 
-
 mpz_t zero, one, two, seven, eight, base, base2, bigNumber, start, check, mod;
 int ctrl_c_count = 0;
 time_t last_ctrl_c_time = 0;
@@ -24,7 +23,9 @@ static void sig_handler(int _)
     {
         printf("Exiting program...\n");
         exit(0);
-    } else {
+    }
+    else
+    {
         last_ctrl_c_time = time(NULL);
     }
 }

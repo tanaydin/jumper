@@ -3,8 +3,9 @@
 #include <gmp.h>
 #include <signal.h>
 #include <time.h>
+#include <stdbool.h>
 
-mpz_t zero, one, two, seven, eight, exponent, exponent2, bigNumber, start, check, mod;
+mpz_t zero, one, two, seven, eight, exponent, exponent2, bigNumber, start, check, mod, tmp;
 int ctrl_c_count = 0;
 time_t last_ctrl_c_time = 0;
 
@@ -33,38 +34,50 @@ int main(int argc, char *argv[])
 {
     signal(SIGINT, sig_handler);
 
+    // Initialize variables.
+    // Initialize variables.
     mpz_inits(zero, one, two, seven, eight, exponent, exponent2, bigNumber, start, check, mod, (mpz_ptr)0);
+
+    // Set constant values.
     mpz_set_ui(one, 1);
     mpz_set_ui(two, 2);
     mpz_set_ui(seven, 7);
     mpz_set_ui(eight, 8);
-    mpz_set_str(exponent, argv[1], 10);
-    mpz_mul(exponent2, exponent, two);
 
+    // Parse exponent from command line arguments.
+    if (argc != 2 || !mpz_set_str(exponent, argv[1], 10))
+    {
+        fprintf(stderr, "Error: invalid exponent\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Check if exponent is prime.
     if (mpz_probab_prime_p(exponent, 20) != 2)
     {
         printf("Exponent is not Prime !\n");
         exit(0);
     }
+
+    // Calculate bigNumber = 2^exponent - 1.
     mpz_pow_ui(bigNumber, two, atoi(argv[1]));
     mpz_sub(bigNumber, bigNumber, one);
     gmp_printf("Number  : %Zd\n", bigNumber);
 
+    // Calculate initial starting value.
     mpz_sqrt(start, bigNumber);
     gmp_printf("Sqrt    : %Zd\n", start);
 
-    while (1)
+    // Decrement start until it is 1 modulo p.
+    mpz_mod(mod, start, exponent);
+    while (mpz_cmp(mod, one) != 0 || !mpz_odd_p(start))
     {
-        mpz_mod(mod, start, exponent);
-        if (mpz_cmp(mod, one) == 0)
-        {
-            if (mpz_odd_p(start))
-                break;
-        }
         mpz_sub(start, start, one);
+        mpz_mod(mod, start, exponent);
     }
     gmp_printf("Start   : %Zd\n", start);
-    while (1)
+
+    // Main loop: decrement start by p * 2 and check for factors.
+    while (true)
     {
         mpz_mod(mod, start, eight);
         if (mpz_cmp(mod, one) == 0 || mpz_cmp(mod, seven) == 0)
@@ -91,6 +104,11 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        mpz_sub(start, start, exponent2);
+
+        // Calculate start = start - p * 2 and decrement start.
+        mpz_mul_ui(tmp, exponent2, 2);
+        mpz_sub(start, start, tmp);
     }
 }
+
+

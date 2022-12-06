@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <time.h>
 
+// Initialize variables.
 mpz_t zero, one, two, seven, eight, exponent, exponent2, bigNumber, start, check, mod;
 int ctrl_c_count = 0;
 time_t last_ctrl_c_time = 0;
@@ -38,32 +39,39 @@ int main(int argc, char *argv[])
     mpz_set_ui(two, 2);
     mpz_set_ui(seven, 7);
     mpz_set_ui(eight, 8);
-    mpz_set_str(exponent, argv[1], 10);
+
+    // Parse exponent from command line arguments.
+    if (argc != 2 || mpz_set_str(exponent, argv[1], 10) != 0)
+    {
+        fprintf(stderr, "Error: invalid exponent\n");
+        exit(EXIT_FAILURE);
+    }
     mpz_mul(exponent2, exponent, two);
 
+    // Check if exponent is prime.
     if (mpz_probab_prime_p(exponent, 20) != 2)
     {
         printf("Exponent is not Prime !\n");
         exit(0);
     }
+    // Calculate bigNumber = 2^exponent - 1.
     mpz_pow_ui(bigNumber, two, atoi(argv[1]));
     mpz_sub(bigNumber, bigNumber, one);
     gmp_printf("Number  : %Zd\n", bigNumber);
 
+    // Calculate initial starting value.
     mpz_sqrt(start, bigNumber);
     gmp_printf("Sqrt    : %Zd\n", start);
 
-    while (1)
+    // Decrement start until it is 1 modulo p.
+    while (mpz_cmp(mod, one) != 0 || !mpz_odd_p(start))
     {
-        mpz_mod(mod, start, exponent);
-        if (mpz_cmp(mod, one) == 0)
-        {
-            if (mpz_odd_p(start))
-                break;
-        }
         mpz_sub(start, start, one);
+        mpz_mod(mod, start, exponent);
     }
     gmp_printf("Start   : %Zd\n", start);
+
+    // Main loop: decrement start by p * 2 and check for factors.
     while (1)
     {
         mpz_mod(mod, start, eight);

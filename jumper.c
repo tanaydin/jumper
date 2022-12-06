@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: invalid exponent\n");
         exit(EXIT_FAILURE);
     }
-    mpz_mul(exponent2, exponent, two);
 
     // Check if exponent is prime.
     if (mpz_probab_prime_p(exponent, 20) != 2)
@@ -54,6 +53,8 @@ int main(int argc, char *argv[])
         printf("Exponent is not Prime !\n");
         exit(0);
     }
+
+    mpz_mul(exponent2, exponent, two);
     // Calculate bigNumber = 2^exponent - 1.
     mpz_pow_ui(bigNumber, two, atoi(argv[1]));
     mpz_sub(bigNumber, bigNumber, one);

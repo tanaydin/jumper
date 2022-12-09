@@ -24,7 +24,7 @@ static void sig_handler(int _)
     if (ctrl_c_count >= 2 && time(NULL) - last_ctrl_c_time <= 2)
     {
         printf("Exiting program...\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     else
     {
@@ -43,7 +43,7 @@ void check_factor(mpz_t number_to_check, mpz_t factor_to_check)
         if (mpz_cmp(mod, zero) == 0)
         {
             gmp_printf("\nFactor  : %Zd\n", factor_to_check);
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
         break;
     case 0:
@@ -66,14 +66,14 @@ int main(int argc, char *argv[])
     if (argc != 2 || mpz_set_str(exponent, argv[1], 10) != 0)
     {
         fprintf(stderr, "Error: invalid exponent\n");
-        exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
 
     // Check if exponent is prime.
     if (mpz_probab_prime_p(exponent, 20) != 2)
     {
         printf("Exponent is not Prime !\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     // Calculate exponent * 2 for using it while searching for a good number to start (1 in mod exponent).
@@ -126,5 +126,5 @@ int main(int argc, char *argv[])
         mpz_sub(checkMod7, checkMod7, exponent8);
     }
     printf("\nMersenne Prime !\n");
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
